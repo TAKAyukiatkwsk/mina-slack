@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["takagi.takayuki.yuuki@gmail.com"]
   spec.description   = %q{Slack web hook from mina}
   spec.summary       = %q{Slack web hook from mina}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/TAKAyukiatkwsk/mina-slack"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
