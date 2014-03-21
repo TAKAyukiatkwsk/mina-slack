@@ -1,6 +1,6 @@
 # Mina::Slack
 
-TODO: Write a gem description
+[Slack](https://slack.com) web hook from [mina](https://github.com/nadarei/mina).
 
 ## Installation
 
@@ -15,10 +15,27 @@ And then execute:
 Or install it yourself as:
 
     $ gem install mina-slack
+    
+In your slack settings, create new Incomming WebHooks and get WebHooks URL.
 
 ## Usage
 
-TODO: Write usage instructions here
+In `config/deploy.rb`
+
+```ruby
+require 'mina/slack'
+    
+# Set your WebHooks URL
+set :slack_hook_url, 'https://teamname.slack.com/services/hooks/incoming-webhook?token=token'
+    
+# Invoke slack task in your deploy task
+task :deploy do
+  deploy do
+    # some deploy commands...
+  end
+  invoke :'slack:finish'
+end
+```
 
 ## Contributing
 
