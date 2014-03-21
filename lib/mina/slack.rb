@@ -1,7 +1,10 @@
 require "mina/slack/version"
+require 'rest-client'
+require 'json'
 
 module Mina
   module Slack
-    # Your code goes here...
   end
 end
+
+load File.expand_path("../slack/tasks/mina-slack.rake", __FILE__)
