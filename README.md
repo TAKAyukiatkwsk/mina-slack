@@ -23,7 +23,7 @@ In your slack settings, create new Incomming WebHooks and get WebHooks URL.
 In `config/deploy.rb`
 
 ```ruby
-require 'mina/slack'
+require 'mina/slack/tasks'
     
 # Set your WebHooks URL
 set :slack_hook_url, 'https://teamname.slack.com/services/hooks/incoming-webhook?token=token'

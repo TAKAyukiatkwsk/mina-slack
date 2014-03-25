@@ -1,3 +1,6 @@
+require 'rest_client'
+require 'json'
+
 set_default :slack_hook_url, ''
 set_default :slack_payload, {text: ''}
 
