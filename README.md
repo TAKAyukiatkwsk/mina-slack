@@ -26,7 +26,10 @@ In `config/deploy.rb`
 require 'mina/slack/tasks'
     
 # Set your WebHooks URL
-set :slack_hook_url, 'https://teamname.slack.com/services/hooks/incoming-webhook?token=token'
+set :slack_hook_url, 'https://my.slack.com/services/hooks/incoming-webhook?token=token'
+# Set deployment env
+# default is value of settings.rails_env
+set :slack_env, 'production'
     
 # Invoke slack task in your deploy task
 task :deploy do
@@ -36,6 +39,8 @@ task :deploy do
   invoke :'slack:finish'
 end
 ```
+
+Notify text is `Finished deploy production` if you configure like above.
 
 ## Contributing
 
