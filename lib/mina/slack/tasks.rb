@@ -50,6 +50,7 @@ namespace :slack do
   end
 
   def post_slack_message(message)
+    return if fetch(:simulate)
     # Parse the URI and handle the https connection
     uri = URI.parse("https://#{fetch(:slack_subdomain)}.slack.com/services/hooks/incoming-webhook?token=#{fetch(:slack_token)}")
     http = Net::HTTP.new(uri.host, uri.port)
