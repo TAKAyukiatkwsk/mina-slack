@@ -1,74 +1,67 @@
-require 'mina/hooks'
 require 'json'
 require 'net/http'
 
-# Before and after hooks for mina deploy
-before_mina :deploy, :'slack:starting'
-after_mina :deploy, :'slack:finished'
-
-
 # Slack tasks
 namespace :slack do
+  # Required
+  set :slack_token,       -> { ENV['SLACK_TOKEN'] }
+  set :slack_room,        -> { ENV['SLACK_ROOM'] }
+  set :slack_subdomain,   -> { ENV['SLACK_SUBDOMAIN'] }
+  # Optional
+  set :slack_stage,       -> { ENV['SLACK_STAGE'] || fetch(:rails_env, 'production') }
+  set :slack_application, -> { ENV['SLACK_APPLICATION'] || fetch(:application_name) }
+  set :slack_username,    -> { ENV['SLACK_USERNAME'] || 'deploybot' }
+  set :slack_emoji,       -> { ENV['SLACK_EMOJI'] || ':cloud:' }
+  # Git
+  set :deployer,          -> { ENV['GIT_AUTHOR_NAME'] || %x[git config user.name].chomp }
+  set :deployed_revision, -> { ENV['GIT_COMMIT'] || %x[git rev-parse #{fetch(:branch)} | cut -c 1-7].strip }
 
   task :starting do
-    if slack_token and slack_room and slack_subdomain
-      announcement = "#{announced_deployer} is deploying #{announced_application_name} to #{announced_stage}"
+    if fetch(:slack_token) && fetch(:slack_room) && fetch(:slack_subdomain)
+      announcement = "#{fetch(:deployer)} is deploying #{announced_application_name} to #{fetch(:slack_stage)}"
 
       post_slack_message(announcement)
       set(:start_time, Time.now)
     else
-      print_local_status "Unable to create Slack Announcement, no slack details provided."
+      print_error 'Unable to create Slack Announcement, no slack details provided.'
     end
   end
 
   task :finished do
-    if slack_token and slack_room and slack_subdomain
+    if fetch(:slack_token) && fetch(:slack_room) && fetch(:slack_subdomain)
       end_time = Time.now
       start_time = fetch(:start_time)
       elapsed = end_time.to_i - start_time.to_i
 
-      announcement = "#{announced_deployer} successfully deployed #{announced_application_name} in #{elapsed} seconds."
+      announcement = "#{fetch(:deployer)} successfully deployed #{announced_application_name} in #{elapsed} seconds."
 
       post_slack_message(announcement)
     else
-      print_local_status "Unable to create Slack Announcement, no slack details provided."
+      print_error 'Unable to create Slack Announcement, no slack details provided.'
     end
-  end
-
-
-  def announced_stage
-    ENV['to'] || rails_env || 'production'
-  end
-
-  def announced_deployer
-    deployer
-  end
-
-  def short_revision
-    deployed_revision[0..7] if deployed_revision
   end
 
   def announced_application_name
     "".tap do |output|
-      output << slack_application if slack_application
-      output << " #{branch}" if branch
-      output << " (#{short_revision})" if short_revision
+      output << fetch(:slack_application)
+      output << " #{fetch(:branch)}" if fetch(:branch)
+      output << " (#{fetch(:deployed_revision)})" if fetch(:deployed_revision)
     end
   end
 
   def post_slack_message(message)
     # Parse the URI and handle the https connection
-    uri = URI.parse("https://#{slack_subdomain}.slack.com/services/hooks/incoming-webhook?token=#{slack_token}")
+    uri = URI.parse("https://#{fetch(:slack_subdomain)}.slack.com/services/hooks/incoming-webhook?token=#{fetch(:slack_token)}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
     payload = {
-      "parse"       => "full",
-      "channel"     => slack_room,
-      "username"    => slack_username,
-      "text"        => message,
-      "icon_emoji"  => slack_emoji
+      'parse'       => 'full',
+      'channel'     => fetch(:slack_room),
+      'username'    => fetch(:slack_username),
+      'text'        => message,
+      'icon_emoji'  => fetch(:slack_emoji)
     }
 
     # Create the post request and setup the form data

@@ -6,7 +6,7 @@
 
 Add this line to your application's Gemfile:
 
-    gem 'mina-slack'
+    gem 'mina-slack', require: false
 
 And then execute:
 
@@ -16,6 +16,10 @@ Or install it yourself as:
 
     $ gem install mina-slack
 
+mina 0.3.x:
+
+    gem 'mina-slack', '~> 0.3.0', require: false
+
 In your slack settings, create new Incomming WebHooks and get WebHooks URL.
 
 ## Usage
@@ -23,8 +27,23 @@ In your slack settings, create new Incomming WebHooks and get WebHooks URL.
 ### Load the recipe
 Include the recipe in your deploy.rb
 
-    # config/deploy.rb
-    require 'mina/slack'
+```ruby
+# config/deploy.rb
+require 'mina/slack'
+
+task :deploy do
+  deploy do
+    invoke :'slack:starting'
+    ...
+
+    on :launch do
+      ...
+      invoke :'slack:finished'
+    end
+  end
+end
+```
+
 
 ### Setup Slack Details
 You'll need to setup your slack details with an API key, room and subdomain. You can add these as ENV variables or in the config/deploy.rb
