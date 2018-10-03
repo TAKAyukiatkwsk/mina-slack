@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'net/http'
 
@@ -13,8 +15,8 @@ namespace :slack do
   set :slack_username,    -> { ENV['SLACK_USERNAME'] || 'deploybot' }
   set :slack_emoji,       -> { ENV['SLACK_EMOJI'] || ':cloud:' }
   # Git
-  set :deployer,          -> { ENV['GIT_AUTHOR_NAME'] || %x[git config user.name].chomp }
-  set :deployed_revision, -> { ENV['GIT_COMMIT'] || %x[git rev-parse #{fetch(:branch)} | cut -c 1-7].strip }
+  set :deployer,          -> { ENV['GIT_AUTHOR_NAME'] || `git config user.name`.chomp }
+  set :deployed_revision, -> { ENV['GIT_COMMIT'] || `git rev-parse #{fetch(:branch)} | cut -c 1-7`.strip }
 
   task :starting do
     if fetch(:slack_token) && fetch(:slack_room) && fetch(:slack_subdomain)
@@ -42,7 +44,7 @@ namespace :slack do
   end
 
   def announced_application_name
-    "".tap do |output|
+    ''.tap do |output|
       output << fetch(:slack_application)
       output << " #{fetch(:branch)}" if fetch(:branch)
       output << " (#{fetch(:deployed_revision)})" if fetch(:deployed_revision)
@@ -67,7 +69,7 @@ namespace :slack do
 
     # Create the post request and setup the form data
     request = Net::HTTP::Post.new(uri.request_uri)
-    request.set_form_data(:payload => payload.to_json)
+    request.set_form_data(payload: payload.to_json)
 
     # Make the actual request to the API
     http.request(request)
