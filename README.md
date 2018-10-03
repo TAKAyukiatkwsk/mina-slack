@@ -38,8 +38,11 @@ task :deploy do
 
     on :launch do
       ...
-      invoke :'slack:finished'
     end
+  end
+
+  run(:local) do
+    invoke :'slack:finished'
   end
 end
 ```
