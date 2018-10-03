@@ -2,6 +2,7 @@
 
 require 'json'
 require 'net/http'
+require 'mina'
 
 # Slack tasks
 namespace :slack do
