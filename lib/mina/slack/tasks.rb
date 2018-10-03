@@ -45,7 +45,7 @@ namespace :slack do
   end
 
   def announced_application_name
-    ''.tap do |output|
+    (+'').tap do |output|
       output << fetch(:slack_application)
       output << " #{fetch(:branch)}" if fetch(:branch)
       output << " (#{fetch(:deployed_revision)})" if fetch(:deployed_revision)
