@@ -1,10 +1,3 @@
-require "mina/slack/version"
+# frozen_string_literal: true
 
-require 'mina/slack/defaults'
-require 'mina/slack/tasks'
-
-
-module Mina
-  module Slack
-  end
-end
+load File.expand_path('./slack/tasks.rb', __dir__)
